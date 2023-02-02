@@ -18,7 +18,7 @@ end
 always@(posedge clk or negedge rst_n) begin
   if (!rst_n)
     o_clk <= 0;
-  else if (cnt < 4'h256) 
+  else if (cnt == 8'h255) 
     o_clk = 0;
   else           
     o_clk = o_clk + 1'b1;   
