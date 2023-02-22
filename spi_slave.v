@@ -18,12 +18,6 @@ output o_clk,
 output reg [7:0] LED
 );
 
-div u0(
-.clk(clk),
-.rst_n(rst_n),
-.o_clk(o_clk)
-);
-
 reg spi_cap = 1'b0;
 reg shift_en = 1'b0;
 reg [3:0] spi_clk_r = 4'b0;
@@ -104,44 +98,6 @@ always @(posedge clk or negedge rst_n) begin
   else
     spi_rx_r <= spi_rx_r;
 end
-
-//====LED Blink=============================
-reg [31:0] buffer_rx;
-reg [31:0] buffer;
-reg LED_en = 1'b0;
-reg [5:0] buffer_cnt = 6'b0;
-reg [4:0] buffer_LEN = 5'd31;
-always @(posedge clk or negedge rst_n) begin
-  if (rst_n ==1'b0)
-    buffer_cnt <= 0;
-  else if(spi_rx_en&&spi_cap) begin
-    buffer_rx <= {buffer_rx[30:0], spi_mosi};
-    buffer_cnt <= buffer_cnt + 1'b1;
-  end
-  else if(buffer_cnt == 6'd32)
-    buffer_cnt <= 6'd0;
-end
-
-always @(posedge clk or negedge rst_n) begin
-  if(rst_n == 1'b0)
-    LED_en <= 1'b0;
-  else if(buffer_cnt == 6'b0)
-    LED_en <= 1'b0;
-  else if(buffer_cnt == 6'd32) begin
-    LED_en <= 1'b1;
-    buffer <= buffer_rx;
-  end
-end
-
-always @(posedge o_clk or negedge rst_n) begin //using sequential divider
-  if (rst_n == 1'b0)
-    LED <= 8'b0;
-  else if(buffer) begin
-    LED <= buffer[buffer_LEN-:8];
-    buffer_LEN <= buffer_LEN - 8;
-  end
-end
-//=================================
 
 
 //spi tx shift
