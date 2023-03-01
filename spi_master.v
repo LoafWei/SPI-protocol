@@ -93,10 +93,12 @@ always @(posedge clk) begin
 end 
 
 always @(posedge clk) begin
-  if(spi_tx_req_i&&(spi_en == 1'b0))
-    LED <= spi_tx_data_r;
-  else
+  if(rst_n== 1'b0)
     LED <= 0;
-end	 
+  else if(tx_data == 8'd255)
+    LED <= LED + 1;
+  else
+    LED <= LED;
+end
 
 endmodule 
